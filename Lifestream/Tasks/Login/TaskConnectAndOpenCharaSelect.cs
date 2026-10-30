@@ -11,7 +11,7 @@ public static unsafe class TaskConnectAndOpenCharaSelect
     public static bool Enqueue(string charaName, string homeWorld)
     {
         var account = Utils.GetServiceAccount($"{charaName}@{homeWorld}");
-        if(ExcelWorldHelper.Get(homeWorld) == null) throw new NullReferenceException("Target world not found");
+        if(RelogWorlds.Resolve(homeWorld) == null) throw new InvalidOperationException("找不到可登入的目標世界，請確認台服世界資料與名稱。");
         if(Utils.CanAutoLogin())
         {
             TaskChangeCharacter.ConnectToDc(homeWorld, account);

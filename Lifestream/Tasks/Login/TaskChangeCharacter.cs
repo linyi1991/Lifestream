@@ -9,7 +9,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 
 namespace Lifestream.Tasks.Login;
-public static unsafe class TaskChangeCharacter
+public static unsafe partial class TaskChangeCharacter
 {
     public static void Enqueue(string currentLoginWorld, string charaName, string charaWorld, int account)
     {
@@ -32,21 +32,6 @@ public static unsafe class TaskChangeCharacter
         P.TaskManager.Enqueue(TaskChangeCharacter.ResetWorldIndex);
         P.TaskManager.Enqueue(() => SelectCharacter(charaName, homeWorld, currentLoginWorld), $"Select chara {charaName}@{homeWorld}", new(timeLimitMS: 1000000));
         P.TaskManager.Enqueue(ConfirmLogin);
-    }
-
-    public static void ConnectToDc(string currentWorld, int account)
-    {
-        var dc = (int)ExcelWorldHelper.Get(currentWorld)?.DataCenter.RowId;
-        if((int)Svc.Data.Language < 4)
-        {
-            P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));
-            P.TaskManager.Enqueue(() => SelectDataCenter(dc), $"Connect to DC {dc}");
-            P.TaskManager.Enqueue(() => SelectServiceAccount(account), $"SelectServiceAccount {account}");
-        }
-        else
-        {
-            P.TaskManager.Enqueue(ClickStart);
-        }
     }
 
     public static bool? SelectYesLogout()
@@ -165,90 +150,6 @@ public static unsafe class TaskChangeCharacter
     public static void ResetWorldIndex() => WorldIndex = -1;
 
     public static int WorldIndex = -1;
-    public static bool? SelectCharacter(string name, string homeWorld, string currentLoginWorld, bool callContextMenu = false, bool onlyChangeWorld = false)
-    {
-        currentLoginWorld ??= homeWorld;
-        if(TryGetAddonByName<AtkUnitBase>("SelectYesno", out _))
-        {
-            Utils.RethrottleGeneric();
-            return true;
-        }
-        if(TryGetAddonByName<AtkUnitBase>("SelectOk", out _))
-        {
-            Utils.RethrottleGeneric();
-            return true;
-        }
-        if(callContextMenu && TryGetAddonByName<AtkUnitBase>("ContextMenu", out var cmenu) && IsAddonReady(cmenu))
-        {
-            Utils.RethrottleGeneric();
-            return true;
-        }
-        if(TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady && TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var mw))
-        {
-            if(m.TemporarilyLocked) return false;
-            if(mw.Worlds.Length == 0) return false;
-            foreach(var c in m.Characters)
-            {
-                if(c.Name == name && ExcelWorldHelper.GetName(c.HomeWorld) == homeWorld)
-                {
-                    if(Utils.GenericThrottle && EzThrottler.Throttle("SelectChara"))
-                    {
-                        if(onlyChangeWorld)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            if(!callContextMenu)
-                            {
-                                PluginLog.Information($"Calling login on {c.Name}@{ExcelWorldHelper.GetName(c.HomeWorld)}, index={c.Index}");
-                                c.Login();
-                            }
-                            else
-                            {
-                                c.OpenContextMenu();
-                            }
-                        }
-                    }
-                    return false;
-                }
-            }
-            for(var i = 0; i < mw.Worlds.Length; i++)
-            {
-                var w = mw.Worlds[i];
-                if(WorldIndex == -1)
-                {
-                    if(w.Name == currentLoginWorld)
-                    {
-                        if(Utils.GenericThrottle && EzThrottler.Throttle("SelectWorld", 150))
-                        {
-                            w.Select();
-                            WorldIndex++;
-                        }
-                        return false;
-                    }
-                }
-                else
-                {
-                    if(i == WorldIndex % mw.Worlds.Length)
-                    {
-                        if(Utils.GenericThrottle && EzThrottler.Throttle("SelectWorld", 150))
-                        {
-                            w.Select();
-                            WorldIndex++;
-                        }
-                        return false;
-                    }
-                }
-            }
-        }
-        else
-        {
-            Utils.RethrottleGeneric();
-        }
-        return false;
-    }
-
     public static bool? ConfirmLogin()
     {
         if(TryGetAddonByName<AtkUnitBase>("SelectOk", out _))

@@ -47,34 +47,6 @@ internal static unsafe partial class Utils
     public static string[] LifestreamNativeCommands = ["auto", "home", "house", "private", "fc", "free", "company", "free company", "apartment", "apt", "shared", "inn", "hinn", "gc", "gcc", "hc", "hcc", "fcgc", "gcfc", "mb", "market", "island", "is", "sanctuary", "cosmic", "ardorum", "moon", "tp"];
 
 
-    public static ErrorCode ChangeCharacter(string charaName, string charaHomeWorld)
-    {
-        if(!ExcelWorldHelper.GetPublicWorlds().Any(x => x.Name == charaHomeWorld))
-        {
-            return ErrorCode.Invalid_world_specified;
-        }
-        if(Player.Available)
-        {
-            TaskLogout.Enqueue();
-            P.TaskManager.Enqueue(() =>
-            {
-                P.TaskManager.InsertStack(() =>
-                {
-                    TaskConnectAndOpenCharaSelect.Enqueue(charaName, charaHomeWorld);
-                });
-            }, "Use TaskConnectAndOpenCharaSelect");
-            P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, null, false), "Use InitiateTravelFromCharaSelectScreenInternal");
-            return ErrorCode.Success;
-        }
-        if(CanAutoLogin())
-        {
-            TaskConnectAndOpenCharaSelect.Enqueue(charaName, charaHomeWorld);
-            P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, null, false));
-            return ErrorCode.Success;
-        }
-        return ErrorCode.Player_is_not_logged_in;
-    }
-
     public static bool IsInnUnlocked()
     {
         var q = UIState.Instance();
@@ -1794,33 +1766,6 @@ internal static unsafe partial class Utils
         }
         //PluginLog.Debug($"{list.Print()}");
         return list;
-    }
-
-    internal static int GetServiceAccount(string name, uint world) => GetServiceAccount($"{name}@{ExcelWorldHelper.GetName(world)}");
-
-    internal static int GetServiceAccount(string nameWithWorld)
-    {
-        if(P.AutoRetainerApi?.Ready == true && C.UseAutoRetainerAccounts)
-        {
-            var chars = P.AutoRetainerApi.GetRegisteredCharacters();
-            foreach(var c in chars)
-            {
-                var data = P.AutoRetainerApi.GetOfflineCharacterData(c);
-                if(data != null)
-                {
-                    var name = $"{data.Name}@{data.World}";
-                    if(nameWithWorld == name && data.ServiceAccount > -1)
-                    {
-                        return data.ServiceAccount;
-                    }
-                }
-            }
-        }
-        if(C.ServiceAccounts.TryGetValue(nameWithWorld, out var ret))
-        {
-            if(ret > -1) return ret;
-        }
-        return 0;
     }
 
     internal static void CheckConfigMigration()

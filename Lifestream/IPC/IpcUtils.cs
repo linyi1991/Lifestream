@@ -6,7 +6,7 @@ public static unsafe class IpcUtils
 {
     public static bool InitiateTravelFromCharaSelectScreenInternal(string charaName, string charaHomeWorld, string? destination, bool noLogin)
     {
-        var homeWorldData = ExcelWorldHelper.Get(charaHomeWorld) ?? throw new NullReferenceException($"Invalid home world specified: {charaHomeWorld}");
+        var homeWorldData = RelogWorlds.Resolve(charaHomeWorld) ?? throw new InvalidOperationException("無效的角色所屬世界，無法繼續登入。");
         if(CharaSelectOverlay.TryGetValidCharaSelectListMenu(out var m))
         {
             var chara = m.Characters.FirstOrDefault(x => x.Name == charaName && x.HomeWorld == homeWorldData.RowId);
@@ -39,7 +39,7 @@ public static unsafe class IpcUtils
 
     public static bool InitiateLoginFromCharaSelectScreenInternal(string charaName, string charaHomeWorld)
     {
-        var homeWorldData = ExcelWorldHelper.Get(charaHomeWorld) ?? throw new NullReferenceException($"Invalid home world specified: {charaHomeWorld}");
+        var homeWorldData = RelogWorlds.Resolve(charaHomeWorld) ?? throw new InvalidOperationException("無效的角色所屬世界，無法繼續登入。");
         if(CharaSelectOverlay.TryGetValidCharaSelectListMenu(out var m))
         {
             var chara = m.Characters.FirstOrDefault(x => x.Name == charaName && x.HomeWorld == homeWorldData.RowId);
