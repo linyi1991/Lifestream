@@ -2,7 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>NightmareXIV</Authors>
-        <Version>2.5.3.6</Version>
+        <!-- Distinct API13 candidate; upstream 2.5.3.7 is API14/net10. -->
+        <Version>2.5.3.601</Version>
     </PropertyGroup>
 
     <PropertyGroup>

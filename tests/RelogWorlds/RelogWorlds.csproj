@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><AllowUnsafeBlocks>true</AllowUnsafeBlocks><NoWarn>CS8600;CS8603;CS8625;CS8632</NoWarn></PropertyGroup><ItemGroup>
+<Compile Include="../../Lifestream/RelogWorldPolicy.cs" Link="RelogWorldPolicy.cs"/><Compile Include="../../Lifestream/RelogWorlds.cs" Link="RelogWorlds.cs"/>
+<Compile Include="../../Lifestream/Utils.Relog.cs" Link="Utils.Relog.cs"/><Compile Include="../../Lifestream/Utils.ServiceAccount.cs" Link="Utils.ServiceAccount.cs"/>
+<Compile Include="../../Lifestream/Tasks/Login/TaskConnectAndOpenCharaSelect.cs" Link="TaskConnectAndOpenCharaSelect.cs"/>
+<Compile Include="../../Lifestream/Tasks/Login/TaskChangeCharacter.Connect.cs" Link="TaskChangeCharacter.Connect.cs"/>
+<Compile Include="../../Lifestream/Tasks/Login/TaskChangeCharacter.Select.cs" Link="TaskChangeCharacter.Select.cs"/>
+<Compile Include="../../Lifestream/Tasks/CrossDC/TaskSelectChara.cs" Link="TaskSelectChara.cs"/><Compile Include="../../Lifestream/IPC/IpcUtils.cs" Link="IpcUtils.cs"/>
+<Compile Include="../../ECommons/ECommons/ErrorCode.cs" Link="ErrorCode.cs"/>
+</ItemGroup></Project>
